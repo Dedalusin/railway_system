@@ -1,6 +1,10 @@
 package com.graduation.railway_system.service;
 
+import com.graduation.railway_system.exception.RepeatPaymentException;
 import com.graduation.railway_system.model.CreateDelayedOrderRequest;
+import com.graduation.railway_system.model.DelayOrder;
+import com.graduation.railway_system.model.Order;
+import com.graduation.railway_system.model.ResponseVo;
 
 /**
  * @author Dedalusin
@@ -9,6 +13,16 @@ import com.graduation.railway_system.model.CreateDelayedOrderRequest;
  */
 public interface OrderService {
 
-    boolean createDelayedOrder(CreateDelayedOrderRequest request);
+    ResponseVo createDelayedOrder(DelayOrder delayOrder);
+
+    ResponseVo sendDelayOrder(DelayOrder delayOrder);
+
+    ResponseVo sendPayOrder(Order order);
+
+    void sendFailOrder(DelayOrder delayOrder);
+
+    void createFailOrder(DelayOrder order);
+
+    void createSucessOrder(Order order) throws RepeatPaymentException;
 
 }

@@ -23,13 +23,19 @@ public class CreateDelayedOrderRequest {
     @NotNull(message = "终点不能为空")
     private String terminalStation;
 
-    @NotNull(message = "时间不能为空")
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date orderTime;
+//    @NotNull(message = "时间不能为空")
+//    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+//    private Date orderTime;
 
     @NotNull(message = "列车id不能为空")
     private Long trainId;
 
     @NotNull(message = "价格不能为空")
     private Double price;
+
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date terminalTime;
 }
