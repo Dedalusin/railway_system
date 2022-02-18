@@ -6,7 +6,7 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * @author Dedalusin

@@ -2,7 +2,7 @@ package com.graduation.railway_system.service;
 
 import com.graduation.railway_system.model.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,6 +19,8 @@ public interface TrainService {
     Long getNewRailwayId();
 
     List<TrainScheduleUnitVo> queryTrainScheduleUnit(String startStation, String terminalStation, Date afterTime);
+
+    void updateTrainScheduleUnit(Long trainId, Long railwayId, String startStation, String terminalStation, int num);
 
     List<Long> getAllRailway();
 

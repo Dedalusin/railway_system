@@ -2,6 +2,7 @@ package com.graduation.railway_system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.graduation.railway_system.model.*;
 import com.graduation.railway_system.repository.RailwayStationMapper;
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,6 +88,15 @@ public class TrainServiceImpl implements TrainService {
         //查询线段树,并将结果收集为Vo
         List<TrainScheduleUnitVo> vos = new ArrayList<>();
         TrainScheduleUnitVo vo;
+        //过滤掉搜寻站点比计划线路左右两边长的情况
+        treeRoots = treeRoots.stream().filter(e -> {
+            String[] unitId = e.getUnitId().split("-");
+            if (railwayMap.get(e.getRailwayId()).getStartNum() < Integer.parseInt(unitId[0])
+                    || railwayMap.get(e.getRailwayId()).getTerminalNum() > Integer.parseInt(unitId[1])) {
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList());
         for (TrainScheduleUnit root : treeRoots) {
             TrainScheduleUnit unit = queryTrainSegmentTree(root, railwayMap.get(root.getRailwayId()).getStartNum(), railwayMap.get(root.getRailwayId()).getTerminalNum());
             vo = new TrainScheduleUnitVo();
@@ -96,6 +106,25 @@ public class TrainServiceImpl implements TrainService {
             vos.add(vo);
         }
         return vos;
+    }
+
+    @Override
+    public void updateTrainScheduleUnit(Long trainId, Long railwayId, String startStation, String terminalStation, int num) {
+        //转换station名为序号便于处理
+        int startNum = 0;
+        int terminalNum = 0;
+        List<RailwayStation> stations = railwayStationMapper.selectList(new LambdaQueryWrapper<RailwayStation>().eq(RailwayStation::getRailwayId, railwayId));
+        for (RailwayStation station : stations) {
+            if (station.getStation().equals(startStation)) {
+                startNum = station.getNum();
+            } else if (station.getStation().equals(terminalStation)) {
+                terminalNum = station.getNum();
+            }
+        }
+        TrainSchedule schedule = trainScheduleMapper.selectById(trainId);
+        TrainScheduleUnit root = trainScheduleUnitMapper.selectOne(new LambdaQueryWrapper<TrainScheduleUnit>().eq(TrainScheduleUnit::getTrainId, trainId)
+                .eq(TrainScheduleUnit::getStartStation, schedule.getStartStation()).eq(TrainScheduleUnit::getTerminalStation, schedule.getTerminalStation()));
+        updateTrainSegmentTree(root, startNum, terminalNum, num);
     }
 
     @Override
@@ -208,6 +237,39 @@ public class TrainServiceImpl implements TrainService {
             result.setRemainingSeats(Math.min(leftResult.getRemainingSeats(), rightResult.getRemainingSeats()));
             result.setPrice(leftResult.getPrice()+rightResult.getPrice());
             return result;
+        }
+    }
+
+    private void updateTrainSegmentTree(TrainScheduleUnit root, int left, int right, int num) {
+        if (root == null) {
+            return;
+        }
+
+        trainScheduleUnitMapper.update(null, new LambdaUpdateWrapper<TrainScheduleUnit>().eq(TrainScheduleUnit::getTrainId, root.getTrainId())
+                .eq(TrainScheduleUnit::getRailwayId, root.getRailwayId()).eq(TrainScheduleUnit::getUnitId, root.getUnitId()).set(TrainScheduleUnit::getRemainingSeats, root.getRemainingSeats()-num));
+
+        if (left+1 >= right) {
+            return;
+        }
+
+        String[] lchild = root.getLeftId().split("-");
+        String[] rchild = root.getRightId().split("-");
+
+
+        if (Integer.parseInt(lchild[0]) <= left && Integer.parseInt(lchild[1]) >= right) {
+            //线段树左边
+            TrainScheduleUnit leftSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id",root.getLeftId()));
+            updateTrainSegmentTree(leftSegment, left, right, num);
+        } else if (Integer.parseInt(rchild[0]) <= left && Integer.parseInt(rchild[1]) >= right) {
+            //线段树右边
+            TrainScheduleUnit rightSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id",root.getRightId()));
+            updateTrainSegmentTree(rightSegment, left, right, num);
+        } else {
+            //线段树中间
+            TrainScheduleUnit leftSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id",root.getLeftId()));
+            TrainScheduleUnit rightSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id",root.getRightId()));
+            updateTrainSegmentTree(leftSegment, left, Integer.parseInt(lchild[1]), num);
+            updateTrainSegmentTree(rightSegment, Integer.parseInt(rchild[0]), right, num);
         }
     }
 }

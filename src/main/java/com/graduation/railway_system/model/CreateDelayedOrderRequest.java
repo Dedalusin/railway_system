@@ -6,7 +6,7 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * @author Dedalusin
@@ -29,6 +29,9 @@ public class CreateDelayedOrderRequest {
 
     @NotNull(message = "列车id不能为空")
     private Long trainId;
+
+    @NotNull(message = "线路id不能为空")
+    private Long railwayId;
 
     @NotNull(message = "价格不能为空")
     private Double price;

@@ -9,13 +9,15 @@ import com.graduation.railway_system.model.Order;
 import com.graduation.railway_system.model.ResponseVo;
 import com.graduation.railway_system.repository.OrderMapper;
 import com.graduation.railway_system.service.OrderService;
+import com.graduation.railway_system.service.TrainService;
+import com.graduation.railway_system.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.sql.Date;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.Future;
 
@@ -35,10 +37,17 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderMapper orderMapper;
 
+    @Autowired
+    TrainService trainService;
+
     @Override
     public ResponseVo sendDelayOrder(DelayOrder delayOrder) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date createTime = new Date(System.currentTimeMillis());
+        createTime = DateUtil.convertDateWithoutMillisecond(createTime);
+        if (createTime == null) {
+            return ResponseVo.failed("日期转换错误");
+        }
         delayOrder.setCreateTime(createTime);
         Order order = new Order();
         BeanUtils.copyProperties(delayOrder, order);
@@ -103,10 +112,11 @@ public class OrderServiceImpl implements OrderService {
                 .eq(Order::getUserId, delayOrder.getUserId())
         );
         if (existOrder == null || existOrder.getIsDelay() == 0) {
-            //delay为0 => 已经失效或者已经确认购买
+            //delay为0 => 已经失效更新过或者已经确认购买
             return;
         }
         existOrder.setIsDelay(0);
+        trainService.updateTrainScheduleUnit(delayOrder.getTrainId(), delayOrder.getRailwayId(), delayOrder.getStartStation(), delayOrder.getTerminalStation(), -1);
         orderMapper.updateById(existOrder);
     }
 

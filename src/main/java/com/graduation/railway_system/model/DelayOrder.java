@@ -2,7 +2,7 @@ package com.graduation.railway_system.model;
 
 import lombok.Data;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +19,8 @@ public class DelayOrder implements Delayed {
     private Long userId;
 
     private Long trainId;
+
+    private Long railwayId;
 
     private String startStation;
 

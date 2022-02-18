@@ -7,6 +7,7 @@ import com.graduation.railway_system.model.DelayOrder;
 import com.graduation.railway_system.model.Order;
 import com.graduation.railway_system.model.ResponseVo;
 import com.graduation.railway_system.service.OrderService;
+import com.graduation.railway_system.service.TrainService;
 import com.sun.xml.internal.bind.v2.TODO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,8 +35,10 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    TrainService trainService;
+
     @NeedSession
-    //TODO 减库存
     @ApiOperation(value = "创建延迟订单", httpMethod = "POST")
     @RequestMapping(value = "/createDelayedOrder")
     public ResponseVo createDelayedOrder(@RequestBody CreateDelayedOrderRequest request, HttpSession session) {
@@ -43,10 +46,11 @@ public class OrderController {
         DelayOrder delayOrder = new DelayOrder();
         BeanUtils.copyProperties(request, delayOrder);
         delayOrder.setUserId(userid);
+        trainService.updateTrainScheduleUnit(request.getTrainId(), request.getRailwayId(), request.getStartStation(), request.getTerminalStation(), 1);
         return orderService.sendDelayOrder(delayOrder);
     }
 
-    //@NeedSession TODO 解除注释
+    @NeedSession
     @ApiOperation(value = "订单支付", httpMethod = "POST")
     @RequestMapping(value = "/payOrder")
     public ResponseVo payOrder(@RequestBody CreateDelayedOrderRequest request, HttpSession session) {

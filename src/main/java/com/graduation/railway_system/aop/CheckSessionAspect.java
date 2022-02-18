@@ -1,5 +1,6 @@
 package com.graduation.railway_system.aop;
 
+import com.graduation.railway_system.model.ResponseVo;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -29,7 +30,7 @@ public class CheckSessionAspect {
     @Around("checkSessionPointCut()")
     public Object before(ProceedingJoinPoint joinPoint) throws Throwable {
         if (request.getSession().getAttribute("userId") == null) {
-            return "redirect:/";
+            return ResponseVo.failed("需要重新登录");
         }
         return joinPoint.proceed();
     }
