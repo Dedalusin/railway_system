@@ -5,7 +5,7 @@
 - 使用到的技术框架、中间件等：
   springboot
   redis
-  mybatis
+  mybatis-plus
   kafka
   swagger
 
