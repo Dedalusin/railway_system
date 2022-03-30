@@ -6,6 +6,8 @@ import com.graduation.railway_system.model.DelayOrder;
 import com.graduation.railway_system.model.Order;
 import com.graduation.railway_system.model.ResponseVo;
 
+import java.util.List;
+
 /**
  * @author Dedalusin
  * @version 1.0
@@ -24,5 +26,7 @@ public interface OrderService {
     void createFailOrder(DelayOrder order);
 
     void createSucessOrder(Order order) throws RepeatPaymentException;
+
+    List<Order> getAllOrders(Long userId);
 
 }

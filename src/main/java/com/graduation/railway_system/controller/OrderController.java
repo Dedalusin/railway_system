@@ -61,4 +61,11 @@ public class OrderController {
         return orderService.sendPayOrder(order);
     }
 
+    @NeedSession
+    @ApiOperation(value = "查询所有订单", httpMethod = "GET")
+    @RequestMapping(value = "/getAllOrders")
+    public ResponseVo getAllOrders(HttpSession session) {
+        Long userid = Long.parseLong(session.getAttribute("userId").toString());
+        return ResponseVo.success(orderService.getAllOrders(userid));
+    }
 }

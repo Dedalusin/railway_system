@@ -3,10 +3,7 @@ package com.graduation.railway_system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.graduation.railway_system.exception.RepeatPaymentException;
 import com.graduation.railway_system.kafka.kafkaSender.KafkaSender;
-import com.graduation.railway_system.model.CreateDelayedOrderRequest;
-import com.graduation.railway_system.model.DelayOrder;
-import com.graduation.railway_system.model.Order;
-import com.graduation.railway_system.model.ResponseVo;
+import com.graduation.railway_system.model.*;
 import com.graduation.railway_system.repository.OrderMapper;
 import com.graduation.railway_system.service.OrderService;
 import com.graduation.railway_system.service.TrainService;
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -135,5 +133,10 @@ public class OrderServiceImpl implements OrderService {
         existOrder.setIsPay(1);
         existOrder.setIsDelay(0);
         orderMapper.updateById(existOrder);
+    }
+
+    @Override
+    public List<Order> getAllOrders(Long userId) {
+        return orderMapper.selectList(new LambdaQueryWrapper<Order>().eq(Order::getUserId, userId));
     }
 }
