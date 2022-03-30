@@ -85,6 +85,7 @@ public class UserController {
     public ResponseVo signout(HttpSession session) {
         session.removeAttribute("token");
         session.removeAttribute("userId");
+        int i = 1;
         return ResponseVo.success("已退出");
     }
 
