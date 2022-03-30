@@ -137,9 +137,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllOrders(Long userId) {
-        int b = 1;
-        int c = 1;
-        int d = 1;
         return orderMapper.selectList(new LambdaQueryWrapper<Order>().eq(Order::getUserId, userId));
     }
 }
