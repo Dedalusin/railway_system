@@ -29,4 +29,6 @@ public interface OrderService {
 
     List<Order> getAllOrders(Long userId);
 
+    boolean revertOrder(Long order);
+
 }

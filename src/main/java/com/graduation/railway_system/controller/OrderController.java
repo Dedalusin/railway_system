@@ -16,10 +16,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * @author Dedalusin
@@ -62,10 +65,39 @@ public class OrderController {
     }
 
     @NeedSession
+    @ApiOperation(value = "订单撤销", httpMethod = "POST")
+    @RequestMapping(value = "/revertOrder")
+    public ResponseVo revertOrder(@RequestParam Long orderId, HttpSession session) {
+        return ResponseVo.success(orderService.revertOrder(orderId));
+    }
+
+    @NeedSession
     @ApiOperation(value = "查询所有订单", httpMethod = "GET")
     @RequestMapping(value = "/getAllOrders")
     public ResponseVo getAllOrders(HttpSession session) {
         Long userid = Long.parseLong(session.getAttribute("userId").toString());
         return ResponseVo.success(orderService.getAllOrders(userid));
+    }
+
+    @NeedSession
+    @ApiOperation(value = "查询所有成功订单", httpMethod = "GET")
+    @RequestMapping(value = "/getAllSuccessOrders")
+    public ResponseVo getAllSuccessOrders(HttpSession session) {
+        Long userid = Long.parseLong(session.getAttribute("userId").toString());
+        List<Order> orders = orderService.getAllOrders(userid).stream()
+                .filter(e -> e.getIsPay() == 1 && e.getIsDelay() == 0)
+                .collect(Collectors.toList());
+        return ResponseVo.success(orders);
+    }
+
+    @NeedSession
+    @ApiOperation(value = "查询所有失败订单", httpMethod = "GET")
+    @RequestMapping(value = "/getAllFailOrders")
+    public ResponseVo getAllFailOrders(HttpSession session) {
+        Long userid = Long.parseLong(session.getAttribute("userId").toString());
+        List<Order> orders = orderService.getAllOrders(userid).stream()
+                .filter(e -> !(e.getIsPay() == 1 && e.getIsDelay() == 0))
+                .collect(Collectors.toList());
+        return ResponseVo.success(orders);
     }
 }

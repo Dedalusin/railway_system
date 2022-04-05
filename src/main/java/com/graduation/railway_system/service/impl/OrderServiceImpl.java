@@ -139,4 +139,16 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getAllOrders(Long userId) {
         return orderMapper.selectList(new LambdaQueryWrapper<Order>().eq(Order::getUserId, userId));
     }
+
+    @Override
+    public boolean revertOrder(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            log.error("无效orderId");
+            return false;
+        }
+        order.setIsPay(0);
+        order.setIsDelay(0);
+        return orderMapper.updateById(order) >= 1;
+    }
 }
