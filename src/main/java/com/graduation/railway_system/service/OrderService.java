@@ -1,10 +1,7 @@
 package com.graduation.railway_system.service;
 
 import com.graduation.railway_system.exception.RepeatPaymentException;
-import com.graduation.railway_system.model.CreateDelayedOrderRequest;
-import com.graduation.railway_system.model.DelayOrder;
-import com.graduation.railway_system.model.Order;
-import com.graduation.railway_system.model.ResponseVo;
+import com.graduation.railway_system.model.*;
 
 import java.util.List;
 
@@ -19,7 +16,7 @@ public interface OrderService {
 
     ResponseVo sendDelayOrder(DelayOrder delayOrder);
 
-    ResponseVo sendPayOrder(Order order);
+    ResponseVo sendPayOrder(PayOrder order);
 
     void sendFailOrder(DelayOrder delayOrder);
 

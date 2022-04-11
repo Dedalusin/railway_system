@@ -2,10 +2,7 @@ package com.graduation.railway_system.controller;
 
 import com.graduation.railway_system.annotation.NeedSession;
 import com.graduation.railway_system.kafka.kafkaSender.KafkaSender;
-import com.graduation.railway_system.model.CreateDelayedOrderRequest;
-import com.graduation.railway_system.model.DelayOrder;
-import com.graduation.railway_system.model.Order;
-import com.graduation.railway_system.model.ResponseVo;
+import com.graduation.railway_system.model.*;
 import com.graduation.railway_system.service.OrderService;
 import com.graduation.railway_system.service.TrainService;
 import com.sun.xml.internal.bind.v2.TODO;
@@ -56,12 +53,8 @@ public class OrderController {
     @NeedSession
     @ApiOperation(value = "订单支付", httpMethod = "POST")
     @RequestMapping(value = "/payOrder")
-    public ResponseVo payOrder(@RequestBody CreateDelayedOrderRequest request, HttpSession session) {
-        Long userid = Long.parseLong(session.getAttribute("userId").toString());
-        Order order = new Order();
-        BeanUtils.copyProperties(request, order);
-        order.setUserId(userid);
-        return orderService.sendPayOrder(order);
+    public ResponseVo payOrder(@RequestBody PayOrder payOrder, HttpSession session) {
+        return orderService.sendPayOrder(payOrder);
     }
 
     @NeedSession
@@ -86,6 +79,17 @@ public class OrderController {
         Long userid = Long.parseLong(session.getAttribute("userId").toString());
         List<Order> orders = orderService.getAllOrders(userid).stream()
                 .filter(e -> e.getIsPay() == 1 && e.getIsDelay() == 0)
+                .collect(Collectors.toList());
+        return ResponseVo.success(orders);
+    }
+
+    @NeedSession
+    @ApiOperation(value = "查询所有需要支付订单", httpMethod = "GET")
+    @RequestMapping(value = "/getAllNeedPayOrders")
+    public ResponseVo getAllNoPayOrders(HttpSession session) {
+        Long userid = Long.parseLong(session.getAttribute("userId").toString());
+        List<Order> orders = orderService.getAllOrders(userid).stream()
+                .filter(e -> e.getIsPay() == 0 && e.getIsDelay() == 1)
                 .collect(Collectors.toList());
         return ResponseVo.success(orders);
     }

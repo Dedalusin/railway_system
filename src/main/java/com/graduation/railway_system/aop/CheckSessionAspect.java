@@ -30,7 +30,7 @@ public class CheckSessionAspect {
     @Around("checkSessionPointCut()")
     public Object before(ProceedingJoinPoint joinPoint) throws Throwable {
         if (request.getSession().getAttribute("userId") == null) {
-            return ResponseVo.failed("需要重新登录");
+            return ResponseVo.notLoginFailed("需要重新登录");
         }
         return joinPoint.proceed();
     }

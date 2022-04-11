@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         order.setIsDelay(1);
         order.setIsPay(0);
         orderMapper.insert(order);
-        delayOrder.setRunAt(createTime.getTime() + 10000L);
+        delayOrder.setRunAt(createTime.getTime() + 30*60*1000L);
         Future future = kafkaSender.send("delayOrder", delayOrder);
         try {
             future.get();
@@ -65,7 +65,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseVo sendPayOrder(Order order) {
+    public ResponseVo sendPayOrder(PayOrder order) {
+        Order existOrder = orderMapper.selectById(order.getOrderId());
+        if (existOrder.getIsPay() == 1) {
+            return ResponseVo.success("已支付");
+        }
+        if (existOrder.getIsDelay() == 0) {
+            return ResponseVo.success("已超时");
+        }
         Future future = kafkaSender.send("success_order", order);
         try {
             future.get();
