@@ -23,7 +23,7 @@ public class QueryTrainScheduleRequest {
     @NotNull(message = "终点站不能为空")
     private String terminalStation;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "日期不能为空")
     private Date startTime;
 }

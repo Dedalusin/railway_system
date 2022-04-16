@@ -110,7 +110,17 @@
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
         </dependency>
+        <!-- lettuce pool 缓存连接池-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.client</artifactId>
+            <version>1.1.4</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

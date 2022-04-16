@@ -1,10 +1,14 @@
 package com.graduation.railway_system.utils;
 
 import com.google.common.cache.*;
+import com.graduation.railway_system.model.TrainScheduleUnit;
 import com.graduation.railway_system.model.TrainScheduleUnitVo;
 import com.graduation.railway_system.service.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -12,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @date 2022/4/10 20:07
  */
+@Component
 public class MultiDataSourceUtil {
 
     @Autowired
@@ -34,7 +39,18 @@ public class MultiDataSourceUtil {
                         @Override
                         public TrainScheduleUnitVo load(String s) throws Exception {
                             //redis 中的车次采用json存储，该json可以直接返回给前端，前端直接取即可，避免后端反复序列化
+                            // key : startstation-terminalstation-date value : scheduleId
+                            // scheduleid : json
+                            TrainScheduleUnitVo vo = (TrainScheduleUnitVo) RedisUtil.get(s);
+
                             return null;
+                        }
+
+                        @Override
+                        public Map<String, TrainScheduleUnitVo> loadAll(Iterable<? extends String> keys) throws Exception {
+
+
+                            return super.loadAll(keys);
                         }
                     }
             );
