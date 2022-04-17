@@ -206,6 +206,12 @@ public class TrainServiceImpl implements TrainService {
     }
 
     @Override
+    public GetTrainScheduleResponse getTrainSchedule(Long trainId) {
+        List<GetTrainScheduleResponse>  trainList = trainScheduleMapper.getAllTrainSchedule().stream().filter(e -> e.getTrainId().equals(trainId)).collect(Collectors.toList());
+        return trainList != null && trainList.size() > 0 ? trainList.get(0) : null;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteTrainSchedule(Long trainId) {
         if (trainScheduleMapper.deleteById(trainId) <= 0) {

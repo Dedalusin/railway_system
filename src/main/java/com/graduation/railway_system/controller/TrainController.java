@@ -6,10 +6,7 @@ import com.graduation.railway_system.service.TrainService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -68,6 +65,13 @@ public class TrainController {
     @RequestMapping(value = "/getAllTrainSchedule", method = RequestMethod.GET)
     public ResponseVo getAllSchedule() {
         return ResponseVo.success(trainService.getAllTrainSchedule());
+    }
+
+    @ApiOperation(value = "查询列车计划", httpMethod = "GET")
+    @RequestMapping(value = "/getTrainSchedule", method = RequestMethod.GET)
+    public ResponseVo getSchedule(@RequestParam Long trainId) {
+        GetTrainScheduleResponse responseData = trainService.getTrainSchedule(trainId);
+        return responseData == null ? ResponseVo.failed("没有该列车") : ResponseVo.success(responseData);
     }
 
     @ApiOperation(value = "删除列车计划", httpMethod = "DELETE")

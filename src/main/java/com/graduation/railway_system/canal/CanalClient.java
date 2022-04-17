@@ -168,7 +168,7 @@ public class CanalClient implements InitializingBean {
                         }
                     }
                     key.append("Seat");
-                    redisTemplate.opsForHash().increment(key.toString(), id, -1);
+                    redisTemplate.opsForHash().increment(key.toString(), id, -1L);
                 } else {
                     boolean needChange = true;
                     StringBuilder key = new StringBuilder();
@@ -206,7 +206,7 @@ public class CanalClient implements InitializingBean {
                     }
                     if (needChange) {
                         key.append("Seat");
-                        redisTemplate.opsForHash().increment(key.toString(), id, 1);
+                        redisTemplate.opsForHash().increment(key.toString(), id, 1L);
                     }
                 }
             }

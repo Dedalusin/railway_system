@@ -28,5 +28,9 @@ public interface TrainService {
 
     List<GetTrainScheduleResponse> getAllTrainSchedule();
 
+    GetTrainScheduleResponse getTrainSchedule(Long trainId);
+
     int deleteTrainSchedule(Long trainId);
+
+
 }
