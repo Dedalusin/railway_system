@@ -132,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
                 .eq(Order::getUserId, order.getUserId())
         );
         if (existOrder == null) {
+            System.out.println("nonono");
             return;
         }
         if (existOrder.getIsPay() == 1) {
