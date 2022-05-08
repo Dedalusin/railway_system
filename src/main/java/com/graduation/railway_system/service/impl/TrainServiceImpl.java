@@ -82,12 +82,14 @@ public class TrainServiceImpl implements TrainService {
 //                        }
 //                    }
 //            );
-
-    private final LoadingCache<String, HashMap<Long, TrainScheduleUnitVo>> searchToIds = CacheBuilder.newBuilder()
+    /**
+     * key 为 startstion+terminalstation+time value 为 一个map(key : 车次id， value：id对应的车次vo)
+     */
+    private final LoadingCache<String, HashMap<String, TrainScheduleUnitVo>> searchToIds = CacheBuilder.newBuilder()
             //设置并发级别为8，并发级别是指可以同时写缓存的线程数
             .concurrencyLevel(8)
             //设置写缓存后30分钟过期
-            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
             //设置缓存容器的初始容量为10
             .initialCapacity(10)
             //设置缓存最大容量为100，超过100之后就会按照LRU最近虽少使用算法来移除缓存项
@@ -96,14 +98,14 @@ public class TrainServiceImpl implements TrainService {
             .recordStats()
             //build方法中可以指定CacheLoader，在缓存不存在时通过CacheLoader的实现自动加载缓存
             .build(
-                    new CacheLoader<String, HashMap<Long, TrainScheduleUnitVo>>() {
+                    new CacheLoader<String, HashMap<String, TrainScheduleUnitVo>>() {
                         @Override
-                        public HashMap<Long, TrainScheduleUnitVo> load(String s) {
-                            Map<Long, TrainScheduleUnitVo> map = redisTemplate.opsForHash().entries(s);
-                            for (Long key : map.keySet()) {
+                        public HashMap<String, TrainScheduleUnitVo> load(String s) {
+                            Map<String, TrainScheduleUnitVo> map = redisTemplate.opsForHash().entries(s);
+                            for (String key : map.keySet()) {
                                 map.get(key).setRemainingSeats((Integer) redisTemplate.opsForHash().get(s+"Seat", key));
                             }
-                            return (HashMap<Long, TrainScheduleUnitVo>) map;
+                            return (HashMap<String, TrainScheduleUnitVo>) map;
                         }
                     }
             );
@@ -149,6 +151,10 @@ public class TrainServiceImpl implements TrainService {
         List<TrainScheduleUnitVo> vos = null;
         try {
             vos = Lists.newArrayList(searchToIds.get(key).values());
+            if (vos.size() == 0) {
+                System.out.println("------------------------------------------" +
+                        "-----------------------");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -338,7 +344,7 @@ public class TrainServiceImpl implements TrainService {
 
         if (Integer.parseInt(lchild[0]) <= left && Integer.parseInt(lchild[1]) >= right) {
             //线段树左边
-            //TODO 改为redis
+            //TODO 改为redis，倒也不用了，缓存在访问链前面，这里实际上数据加载缓存的过程，下同
             TrainScheduleUnit leftSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id", root.getLeftId()));
             return queryTrainSegmentTree(leftSegment, left, right);
         } else if (Integer.parseInt(rchild[0]) <= left && Integer.parseInt(rchild[1]) >= right) {
