@@ -2,6 +2,7 @@ package com.graduation.railway_system.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.graduation.railway_system.constant.UserBit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,5 +41,7 @@ public class User implements Serializable {
     private String email;
     @NotNull(message = "手机号不能为空")
     private String phone;
+
+    int userStatus;
 }
 
