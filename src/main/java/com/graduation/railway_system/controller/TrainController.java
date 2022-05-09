@@ -31,8 +31,9 @@ public class TrainController {
      */
     @ApiOperation(value = "创建铁路线", httpMethod = "POST")
     @RequestMapping(value = "/createRailway", method = RequestMethod.POST)
-    public void createRailway(@RequestBody CreateRailwayRequest request) {
+    public ResponseVo createRailway(@RequestBody CreateRailwayRequest request) {
         trainService.createRailway(request.getRailwayId(), request.getStationList());
+        return ResponseVo.success("创建成功");
     }
 
     @ApiOperation(value = "创建列车计划", httpMethod = "POST")
@@ -55,7 +56,7 @@ public class TrainController {
         return ResponseVo.success(railwayIds);
     }
 
-    @ApiOperation(value = "创建列车计划", httpMethod = "POST")
+    @ApiOperation(value = "查询所有站点by线路id", httpMethod = "POST")
     @RequestMapping(value = "/getAllStationsByRailwayId", method = RequestMethod.GET)
     public ResponseVo getAllStations(Long railwayId) {
         return ResponseVo.success(trainService.getAllStationsByRailwayId(railwayId));
@@ -83,4 +84,10 @@ public class TrainController {
             return ResponseVo.failed("删除失败");
         }
     }
+    @ApiOperation(value = "查询所有站点", httpMethod = "GET")
+    @RequestMapping(value = "/getAllStations", method = RequestMethod.GET)
+    public ResponseVo getAllStations() {
+        return ResponseVo.success(trainService.getAllStations());
+    }
+
 }

@@ -59,9 +59,7 @@ class RailwaySystemApplicationTests {
 //        List<GetTrainScheduleResponse> list = trainService.getAllTrainSchedule();
 //        list.forEach(e -> System.out.print(e.toString()));
 //        System.out.println(trainService.deleteTrainSchedule(3
-        Object s = null;
-        String ss = (String)s;
-        System.out.println(ss);
+        trainService.getAllRailway().forEach(e -> System.out.println(e));
     }
 
 }

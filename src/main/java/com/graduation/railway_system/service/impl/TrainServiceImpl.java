@@ -203,7 +203,9 @@ public class TrainServiceImpl implements TrainService {
 
     @Override
     public List<RailwayStation> getAllStationsByRailwayId(Long railwayId) {
-        return railwayStationMapper.selectList(new LambdaQueryWrapper<RailwayStation>().eq(RailwayStation::getRailwayId, railwayId));
+        List<RailwayStation> statations = railwayStationMapper.selectList(new LambdaQueryWrapper<RailwayStation>().eq(RailwayStation::getRailwayId, railwayId));
+        statations.sort(Comparator.comparingInt(RailwayStation::getNum));
+        return statations;
     }
 
     @Override
@@ -226,6 +228,13 @@ public class TrainServiceImpl implements TrainService {
             trainScheduleUnitMapper.delete(new LambdaQueryWrapper<TrainScheduleUnit>().eq(TrainScheduleUnit::getTrainId, trainId));
         }
         return 1;
+    }
+
+    @Override
+    public List<String> getAllStations() {
+        QueryWrapper<RailwayStation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("Distinct station");
+        return railwayStationMapper.selectList(queryWrapper).stream().map(RailwayStation::getStation).collect(Collectors.toList());
     }
 
     public List<TrainScheduleUnitVo> queryTrainScheduleUnitFromSql(String startStation, String terminalStation, Date date) {
@@ -344,17 +353,14 @@ public class TrainServiceImpl implements TrainService {
 
         if (Integer.parseInt(lchild[0]) <= left && Integer.parseInt(lchild[1]) >= right) {
             //线段树左边
-            //TODO 改为redis，倒也不用了，缓存在访问链前面，这里实际上数据加载缓存的过程，下同
             TrainScheduleUnit leftSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id", root.getLeftId()));
             return queryTrainSegmentTree(leftSegment, left, right);
         } else if (Integer.parseInt(rchild[0]) <= left && Integer.parseInt(rchild[1]) >= right) {
             //线段树右边
-            //TODO 改为redis
             TrainScheduleUnit rightSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id", root.getRightId()));
             return queryTrainSegmentTree(rightSegment, left, right);
         } else {
             //线段树中间
-            //TODO 改为redis
             TrainScheduleUnit leftSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id", root.getLeftId()));
             TrainScheduleUnit rightSegment = trainScheduleUnitMapper.selectOne(new QueryWrapper<TrainScheduleUnit>().eq("railway_id", root.getRailwayId()).eq("train_id", root.getTrainId()).eq("unit_id", root.getRightId()));
             TrainScheduleUnit leftResult = queryTrainSegmentTree(leftSegment, left, Integer.parseInt(lchild[1]));

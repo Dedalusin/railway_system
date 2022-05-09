@@ -32,5 +32,6 @@ public interface TrainService {
 
     int deleteTrainSchedule(Long trainId);
 
+    List<String> getAllStations();
 
 }

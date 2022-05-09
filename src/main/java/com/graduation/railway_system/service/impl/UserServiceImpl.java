@@ -1,11 +1,13 @@
 package com.graduation.railway_system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.graduation.railway_system.constant.UserBit;
 import com.graduation.railway_system.model.LoginRequest;
 import com.graduation.railway_system.model.LoginResponse;
 import com.graduation.railway_system.model.User;
 import com.graduation.railway_system.repository.UserMapper;
 import com.graduation.railway_system.service.UserService;
+import com.graduation.railway_system.utils.UserBitUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         BeanUtils.copyProperties(user, response);
+        response.setEnableManager(UserBitUtil.checkUser(user, UserBit.MANAGER));
         return response;
     }
 

@@ -47,11 +47,11 @@ public class TrainSchedule {
      * 按照station的编号顺序
      */
     @TableField(exist = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     List<Date> allStartTime;
 
     @TableField(exist = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     List<Date> allTerminalTime;
 
     Double price;

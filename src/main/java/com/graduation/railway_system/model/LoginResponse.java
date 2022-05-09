@@ -18,4 +18,6 @@ public class LoginResponse implements Serializable {
 
     private Long userId;
 
+    private boolean enableManager;
+
 }
